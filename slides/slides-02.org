@@ -285,7 +285,7 @@ let suffix = sans.Substring(l-20)
 #time "off"
 printfn "Length = %d, digits %s ... %s" l prefix suffix
 #+end_src
-
+\scriptsize
 #+RESULTS[48ceffe7837985d7ca2aed6e9d3626651a7bf66e]:
 #+begin_example
 let sans = answer.ToString()
@@ -556,8 +556,10 @@ checkString " "
 
 #+RESULTS:
 : System.ArgumentException: Must not be white space
-:    at FSI_0092.checkString(String s)
-:    at <StartupCode$FSI_0092>.$FSI_0092.main@()
+:    at FSI_0272.checkString(String s) in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 1096
+:    at <StartupCode$FSI_0272>.$FSI_0272.main@() in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 1101
+:    at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+:    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
 : Stopped due to error
 
 ** DONE Result (Result<'Success,'Failure>)
@@ -577,6 +579,7 @@ t1, t2, t3
 #+end_src
 
 #+RESULTS:
+: t1, t2, t3;;
 : val it: Result<string,string> * Result<string,string> * Result<string,string>
 : = (Error "Must not be null", Error "Must not be empty",
 :    Error "Must not be white space")
@@ -602,10 +605,11 @@ notEmpty, t1, t2, t3
 #+end_src
 
 #+RESULTS:
+: notEmpty, t1, t2, t3;;
 : val it:
 :   (string -> Result<string,ValidationError>) * Result<string,ValidationError> *
 :   Result<string,ValidationError> * Result<string,ValidationError> =
-:   (<fun:it@481-7>, Error MustNotBeNull, Error MustNotBeEmpty,
+:   (<fun:it@1127-26>, Error MustNotBeNull, Error MustNotBeEmpty,
 :    Error MustNotBeWhiteSpace)
 
 ** DONE Map

@@ -1,4 +1,4 @@
-% Created 2024-03-15 Fri 00:58
+% Created 2024-03-15 Fri 01:11
 % Intended LaTeX compiler: pdflatex
 \documentclass[t]{beamer}
 \usepackage[utf8]{inputenc}
@@ -52,9 +52,9 @@
 \maketitle
 
 \section{Ziel }
-\label{sec:org55d1b27}
+\label{sec:org27e3881}
 
-\begin{frame}[label={sec:org48a7be7}]{Programm}
+\begin{frame}[label={sec:org0255d79}]{Programm}
 \begin{itemize}
 \item Hausaufgaben
 \item Algorithmen
@@ -71,9 +71,9 @@
 \end{frame}
 
 \section{Hausaufgaben }
-\label{sec:org065e470}
+\label{sec:org7992d2e}
 
-\begin{frame}[label={sec:org8cb7701},fragile]{Two-Fer}
+\begin{frame}[label={sec:orge504015},fragile]{Two-Fer}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let twoFer (input: string option): string = 
     input 
@@ -91,7 +91,7 @@ val test1: string list =
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org0b4f6be},fragile]{Leap}
+\begin{frame}[label={sec:org9e3e6d0},fragile]{Leap}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let divisible_by n d = n % d = 0
 let leapYear year =
@@ -112,7 +112,7 @@ val test2: bool list = [true; false; true]
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:orgb00dcce},fragile]{Isogram}
+\begin{frame}[label={sec:org2eecb17},fragile]{Isogram}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let isIsogram (str: string) =
     let letters =
@@ -134,7 +134,7 @@ val test2: bool list = [false; true]
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org5079d83},fragile]{Sum Of Multiples}
+\begin{frame}[label={sec:org60d137b},fragile]{Sum Of Multiples}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let multiplesOf max n =
     if n = 0 then [0] else [n .. n .. (max - 1)]
@@ -164,9 +164,9 @@ val test: int list = [233168; 39614537]
 \end{frame}
 
 \section{Algorithmen (List Ops) }
-\label{sec:org8ebbc11}
+\label{sec:org5245471}
 
-\begin{frame}[label={sec:org5cf5cb5},fragile]{length}
+\begin{frame}[label={sec:orgd1636d3},fragile]{length}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let rec length' list =
     match list with
@@ -191,7 +191,7 @@ val test2: int list = [0; 4]
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org617c407},fragile]{reverse}
+\begin{frame}[label={sec:org3e14621},fragile]{reverse}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let reverse list =
     let rec _reverse list acc =
@@ -211,7 +211,7 @@ val test2: int list list = [[4; 5; 6; 7; 8]; []; [3]; [1; 2]]
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org63c6b74},fragile]{map}
+\begin{frame}[label={sec:orge84af5d},fragile]{map}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let map f list = 
     let rec _map f list acc =
@@ -229,7 +229,7 @@ val test: int list = [2; 4; 6; 8]
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org1b94b36},fragile]{filter (Übung)}
+\begin{frame}[label={sec:orgfd73fcc},fragile]{filter (Übung)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 // filter : f:('a -> bool) -> list:'a list -> 'a list
 let filter f list =
@@ -253,7 +253,7 @@ val test : int list =
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org933111b},fragile]{filter (Lösung 1)}
+\begin{frame}[label={sec:org3ef1dd5},fragile]{filter (Lösung 1)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let rec filter f list = 
     match list with
@@ -276,7 +276,7 @@ val test: int list =
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org155c2e7},fragile]{filter (Lösung 2)}
+\begin{frame}[label={sec:org5190aa3},fragile]{filter (Lösung 2)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let filter f list = 
     let rec _filter f list acc = 
@@ -291,7 +291,7 @@ test
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:org41ac396}]{Große Zahlen (Übung)}
+\begin{frame}[label={sec:orgaadbeea}]{Große Zahlen (Übung)}
 \begin{itemize}
 \item Berechne \(5^{4^{3^2}}\)
 \item Wie lang ist die Zahl?
@@ -299,7 +299,7 @@ test
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgd2f6fc9},fragile]{Große Zahlen (Lösung)}
+\begin{frame}[label={sec:org3181c45},fragile]{Große Zahlen (Lösung)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 #time "on"
 let answer = 5I **(int (4I ** (int (3I ** 2))));;
@@ -318,7 +318,7 @@ let prefix = sans.Substring(0,20)
 let suffix = sans.Substring(l-20)
 #time "off"
 printfn "Length = %d, digits %s ... %s" l prefix suffix;;
-Real: 00:00:00.695, CPU: 00:00:00.686, GC gen0: 0, gen1: 0, gen2: 0
+Real: 00:00:00.481, CPU: 00:00:00.489, GC gen0: 0, gen1: 0, gen2: 0
 val sans: string =
   "6206069878660874470748320557284679309194219265199117173177383"+[183170 chars]
 val l: int = 183231
@@ -331,9 +331,31 @@ val suffix: string = "92256259918212890625"
 Length = 183231, digits 62060698786608744707 ... 92256259918212890625
 val it: unit = ()
 \end{verbatim}
+
+\scriptsize
+\begin{verbatim}
+let sans = answer.ToString()
+let l = sans.Length
+let prefix = sans.Substring(0,20)
+let suffix = sans.Substring(l-20)
+#time "off"
+printfn "Length = %d, digits %s ... %s" l prefix suffix;;
+Real: 00:00:00.502, CPU: 00:00:00.505, GC gen0: 0, gen1: 0, gen2: 0
+val sans: string =
+  "62060698786608744707483205572846793091942O19265199117173177383"+[183170 chars]
+val l: int = 183231
+val prefix: string = "62060698786608744707"
+val suffix: string = "92256259918212890625"
+
+
+--> Timing now off
+
+Length = 183231, digits 62060698786608744707 ... 92256259918212890625
+val it: unit = ()
+\end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org1e266c4},fragile]{foldl}
+\begin{frame}[label={sec:org927bff6},fragile]{foldl}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let rec foldl folder state list = 
     match list with
@@ -352,7 +374,7 @@ val test2: Numerics.BigInteger =
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org9ffefd0},fragile]{foldr}
+\begin{frame}[label={sec:org0765767},fragile]{foldr}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let flip f b a = f a b 
 let rec foldr folder state list = 
@@ -368,7 +390,7 @@ val test: int = 15
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org09be891},fragile]{append}
+\begin{frame}[label={sec:org086af7e},fragile]{append}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let append xs ys = foldr (fun x acc -> x :: acc) ys xs
 
@@ -384,7 +406,7 @@ val test: int list = [1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org93acaf8},fragile]{concat (1)}
+\begin{frame}[label={sec:orgbbd6af4},fragile]{concat (1)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let concat xs = foldr append [] xs
 let rec concat' xs = 
@@ -408,7 +430,7 @@ val concat'': xs: 'a list list -> 'a list
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org03c79a4},fragile]{concat (2)}
+\begin{frame}[label={sec:org1c0cfc7},fragile]{concat (2)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let test1 = concat [[1; 2]; [3]; []; [4; 5; 6]]
 let test2 = concat' [[1; 2]; [3]; []; [4; 5; 6]]
@@ -436,7 +458,7 @@ val test3b: int list list = [[1]; [2]; [3]; []; [4; 5; 6]]
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org0edeea1}]{Pause}
+\begin{frame}[label={sec:org14eabd9}]{Pause}
 \begin{block}{}
 There is no programming language, no matter how structured, 
 that will prevent programmers from making bad programs.
@@ -446,14 +468,14 @@ that will prevent programmers from making bad programs.
 \end{frame}
 
 \section{ROP }
-\label{sec:org093f422}
-\begin{frame}[label={sec:orge2d6aef}]{ROP}
+\label{sec:org9c9de39}
+\begin{frame}[label={sec:org6220816}]{ROP}
 \(\leadsto\) \href{./2 Railway Oriented Programming.pdf}{Railway Oriented Programming}
 
 \null\hfill--Scott Wlashin: \href{https://fsharpforfunandprofit.com/rop/}{F\# for Fun and Profit}
 \end{frame}
 
-\begin{frame}[label={sec:org75bf1f6},fragile]{Option}
+\begin{frame}[label={sec:org1f6d370},fragile]{Option}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 type BillingDetails = { 
     name : string
@@ -470,7 +492,7 @@ let order2 = {
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:orgfe7e470},fragile]{Option}
+\begin{frame}[label={sec:org83b8d45},fragile]{Option}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let addressForPackage (details : BillingDetails) = 
     let address =
@@ -494,7 +516,7 @@ val it: unit = ()
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:orged8f3b7},fragile]{Option \texttt{bind} and \texttt{map}}
+\begin{frame}[label={sec:org6757350},fragile]{Option \texttt{bind} and \texttt{map}}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 open System
 let tryLastLine (address : string) = 
@@ -514,7 +536,7 @@ let tryHub (details : BillingDetails) =
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:orgb128144},fragile]{Option}
+\begin{frame}[label={sec:org08e6c4d},fragile]{Option}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 let test1 = order1 |> tryHub
 let test2 = order2 |> tryHub
@@ -526,7 +548,7 @@ val test2: string option = Some "Hub 1"
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org146bc7f},fragile]{Result (Imperativ)}
+\begin{frame}[label={sec:org9b6a3e3},fragile]{Result (Imperativ)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 open System
 let checkString (s : string) =
@@ -545,15 +567,15 @@ checkString " "
 
 \begin{verbatim}
 System.ArgumentException: Must not be white space
-   at FSI_0316.checkString(String s) in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 1270
-   at <StartupCode$FSI_0316>.$FSI_0316.main@() in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 1275
+   at FSI_0448.checkString(String s) in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 1792
+   at <StartupCode$FSI_0448>.$FSI_0448.main@() in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 1797
    at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
 Stopped due to error
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org682859f},fragile]{Result (Result<'Success,'Failure>)}
+\begin{frame}[label={sec:org50b4d07},fragile]{Result (Result<'Success,'Failure>)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 open System
 let notEmpty (s : string) =
@@ -575,7 +597,7 @@ val it: Result<string,string> * Result<string,string> * Result<string,string>
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:orgc68937d},fragile]{Result (Error-Types DU)}
+\begin{frame}[label={sec:org8fa98fb},fragile]{Result (Error-Types DU)}
  \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
 open System
 type ValidationError =
@@ -598,12 +620,12 @@ notEmpty, t1, t2, t3;;
 val it:
   (string -> Result<string,ValidationError>) * Result<string,ValidationError> *
   Result<string,ValidationError> * Result<string,ValidationError> =
-  (<fun:it@1301-30>, Error MustNotBeNull, Error MustNotBeEmpty,
+  (<fun:it@1823-42>, Error MustNotBeNull, Error MustNotBeEmpty,
    Error MustNotBeWhiteSpace)
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:org7f7af9c},fragile]{Map}
+\begin{frame}[label={sec:org27f0cbb},fragile]{Map}
  \begin{itemize}
 \item E.map (\texttt{<\$>}): \texttt{(a->b) -> E<a> -> E<b>}
 \begin{center}
@@ -615,7 +637,7 @@ val it:
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org4e9122b},fragile]{Bind}
+\begin{frame}[label={sec:org5b5ab90},fragile]{Bind}
  \begin{itemize}
 \item E.bind (\texttt{>{}>{}=}): \texttt{(a->E<b>) -> E<a> -> E<b>}
 \begin{center}
@@ -627,7 +649,7 @@ val it:
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgff3bdd9}]{Pause}
+\begin{frame}[label={sec:org8f569bf}]{Pause}
 \begin{block}{}
 Applications programming is a race between software engineers, 
 who strive to produce idiot-proof programs, 
@@ -639,8 +661,8 @@ So far the Universe is winning.
 \end{frame}
 
 \section{Ende }
-\label{sec:org9f5fc5b}
-\begin{frame}[label={sec:org66bfdb8}]{Zusammenfassung}
+\label{sec:org0c5a780}
+\begin{frame}[label={sec:orge2f1d4c}]{Zusammenfassung}
 \begin{itemize}
 \item funktionale Operationen auf Listen (Tail-Rekursion)
 \item funktionaler Umgang mit fehlenden Daten (Option)
@@ -648,7 +670,7 @@ So far the Universe is winning.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orge66cb1b}]{Links}
+\begin{frame}[label={sec:orgc5dc745}]{Links}
 \begin{itemize}
 \item \href{https://fsharp.org/}{fsharp.org}
 \item \href{https://docs.microsoft.com/de-de/dotnet/fsharp/}{docs.microsoft.com/../dotnet/fsharp}
@@ -658,7 +680,7 @@ So far the Universe is winning.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org438b5dd}]{Hausaufgabe}
+\begin{frame}[label={sec:orgf5d540c}]{Hausaufgabe}
 \begin{itemize}
 \item exercism.io (E-Mail bis 02.02)
 \begin{itemize}
