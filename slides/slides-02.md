@@ -231,9 +231,30 @@
     let suffix = sans.Substring(l-20)
     #time "off"
     printfn "Length = %d, digits %s ... %s" l prefix suffix;;
-    Real: 00:00:00.498, CPU: 00:00:00.496, GC gen0: 0, gen1: 0, gen2: 0
+    Real: 00:00:00.510, CPU: 00:00:00.806, GC gen0: 0, gen1: 0, gen2: 0
     val sans: string =
       "6206069878660874470748320557284679309194219265199117173177383"+[183170 chars]
+    val l: int = 183231
+    val prefix: string = "62060698786608744707"
+    val suffix: string = "92256259918212890625"
+    
+    
+    --> Timing now off
+    
+    Length = 183231, digits 62060698786608744707 ... 92256259918212890625
+    val it: unit = ()
+
+\scriptsize
+
+    let sans = answer.ToString()
+    let l = sans.Length
+    let prefix = sans.Substring(0,20)
+    let suffix = sans.Substring(l-20)
+    #time "off"
+    printfn "Length = %d, digits %s ... %s" l prefix suffix;;
+    Real: 00:00:00.502, CPU: 00:00:00.505, GC gen0: 0, gen1: 0, gen2: 0
+    val sans: string =
+      "62060698786608744707483205572846793091942O19265199117173177383"+[183170 chars]
     val l: int = 183231
     val prefix: string = "62060698786608744707"
     val suffix: string = "92256259918212890625"
@@ -380,14 +401,11 @@ $\leadsto$ [Railway Oriented Programming](./2 Railway Oriented Programming.pdf)
     printfn "%s" (addressForPackage order1)
     printfn "%s" (addressForPackage order2)
 
-    Adam Smith
-    112 Fibonacci Street
-    35813
-    John Doe
-    16 Planck Parkway
-    62291
-    val addressForPackage: details: BillingDetails -> string
-    val it: unit = ()
+    
+      let addressForPackage (details : BillingDetails) = 
+      ---------------------------------^^^^^^^^^^^^^^
+    
+    /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin(297,34): error FS0039: The type 'BillingDetails' is not defined.
 
 
 ## Option `bind` and `map`
@@ -414,8 +432,11 @@ $\leadsto$ [Railway Oriented Programming](./2 Railway Oriented Programming.pdf)
     let test1 = order1 |> tryHub
     let test2 = order2 |> tryHub
 
-    val test1: string option = None
-    val test2: string option = Some "Hub 1"
+    
+      let test1 = order1 |> tryHub
+      ------------^^^^^^
+    
+    /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin(306,13): error FS0039: The value or constructor 'order1' is not defined.
 
 
 ## Result (Imperativ)
@@ -435,8 +456,8 @@ $\leadsto$ [Railway Oriented Programming](./2 Railway Oriented Programming.pdf)
     checkString " "
 
     System.ArgumentException: Must not be white space
-       at FSI_0360.checkString(String s) in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 1444
-       at <StartupCode$FSI_0360>.$FSI_0360.main@() in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 1449
+       at FSI_0078.checkString(String s) in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 316
+       at <StartupCode$FSI_0078>.$FSI_0078.main@() in /Users/kirchnerg/Desktop/courses/course.2024.hwr.fun/slides/stdin:line 321
        at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
        at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
     Stopped due to error
@@ -482,7 +503,7 @@ $\leadsto$ [Railway Oriented Programming](./2 Railway Oriented Programming.pdf)
     val it:
       (string -> Result<string,ValidationError>) * Result<string,ValidationError> *
       Result<string,ValidationError> * Result<string,ValidationError> =
-      (<fun:it@1475-34>, Error MustNotBeNull, Error MustNotBeEmpty,
+      (<fun:it@347-7>, Error MustNotBeNull, Error MustNotBeEmpty,
        Error MustNotBeWhiteSpace)
 
 
@@ -533,7 +554,7 @@ $\leadsto$ [Railway Oriented Programming](./2 Railway Oriented Programming.pdf)
 
 ## Hausaufgabe
 
--   exercism.io (E-Mail bis 02.02)
+-   exercism.io (E-Mail bis 02.04)
     -   [ ] Queen Attack
     -   [ ] Raindrops
     -   [ ] Gigasecond
