@@ -1,0 +1,497 @@
+% Created 2024-04-19 Fri 11:30
+% Intended LaTeX compiler: pdflatex
+\documentclass[t]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\mode<beamer>{\usetheme{Amsterdam}}
+\mode<beamer>{\usecolortheme{rose}}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage[babelshorthands=true]{german}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage[misc]{ifsym}
+\definecolor{darkblue}{rgb}{0,0,.5}
+\definecolor{darkgreen}{rgb}{0,.5,0}
+\definecolor{islamicgreen}{rgb}{0.0, 0.56, 0.0}
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{mintedbg}{rgb}{0.95,0.95,0.95}
+\definecolor{arsenic}{rgb}{0.23, 0.27, 0.29}
+\definecolor{prussianblue}{rgb}{0.0, 0.19, 0.33}
+\definecolor{coolblack}{rgb}{0.0, 0.18, 0.39}
+\hypersetup{colorlinks=true, breaklinks=true, anchorcolor=blue,linkcolor=white, citecolor=islamicgreen, filecolor=darkred,  urlcolor=darkblue}
+\usepackage{booktabs}
+\usepackage{pgf}
+\usepackage{minted}
+\RequirePackage{fancyvrb}
+\DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+\usetheme{default}
+\author{Göran Kirchner\thanks{e\_kirchnerg@doz.hwr-berlin.de}}
+\date{2024-04-19}
+\title{Funktionale Programmierung in F\# (4)}
+\subtitle{Domain Driven Design \& Property Based Testing}
+\hypersetup{
+ pdfauthor={Göran Kirchner},
+ pdftitle={Funktionale Programmierung in F\# (4)},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 29.1 (Org mode 9.6.6)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+
+\section{Ziel }
+\label{sec:org3f94811}
+\begin{frame}[label={sec:orgfd5082a}]{Programm}
+\begin{itemize}
+\item Hausaufgaben (8..10/10)
+\begin{itemize}
+\item[{$\boxtimes$}] Bank Account
+\item[{$\boxtimes$}] Accumulate
+\item[{$\boxtimes$}] Space Age
+\end{itemize}
+\item Domain Driven Design (DDD)
+\item Property Based Testing
+\end{itemize}
+\end{frame}
+
+\section{Hausaufgaben }
+\label{sec:org8aefc7e}
+
+\begin{frame}[label={sec:org711a77a},fragile]{Bank Account (1)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+type OpenAccount =
+    { mutable Balance: decimal }
+type Account =
+    | Closed
+    | Open of OpenAccount
+let mkBankAccount() = Closed
+let openAccount account =
+    match account with
+    | Closed -> Open { Balance = 0.0m }
+    | Open _ -> failwith "Account is already open"
+\end{minted}
+
+\begin{verbatim}
+type OpenAccount =
+  { mutable Balance: decimal }
+type Account =
+  | Closed
+  | Open of OpenAccount
+val mkBankAccount: unit -> Account
+val openAccount: account: Account -> Account
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org0052fdb},fragile]{Bank Account (2)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let closeAccount account =
+    match account with
+    | Open _ -> Closed
+    | Closed -> failwith "Account is already closed"
+let getBalance account =
+    match account with
+    | Open openAccount -> Some openAccount.Balance
+    | Closed -> None
+let updateBalance change account =
+    match account with
+    | Open openAccount ->
+        lock (openAccount) (fun _ ->
+            openAccount.Balance <- openAccount.Balance + change
+            Open openAccount)
+    | Closed -> failwith "Account is closed"
+\end{minted}
+\end{frame}
+
+\begin{frame}[label={sec:org653a09d},fragile]{Bank Account (3)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let account = mkBankAccount() |> openAccount
+let updateAccountAsync =        
+    async { account |> updateBalance 1.0m |> ignore }
+let ``updated from multiple threads`` =
+    updateAccountAsync
+        |> List.replicate 1000
+        |> Async.Parallel 
+        |> Async.RunSynchronously
+        |> ignore
+let test1 = getBalance account = (Some 1000.0m)
+\end{minted}
+\end{frame}
+
+\begin{frame}[label={sec:orgd87d6f2},fragile]{Accumulate}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let rec accumulateR func input acc = 
+    match input with
+    | [] -> acc |> List.rev
+    | head::tail -> accumulateR func tail (func head :: acc)
+let accumulate func input = accumulateR func input []
+let test1 = accumulate (fun x -> x * x) [1; 2; 3]
+let test2 = accumulate (fun (x:string) -> x.ToUpper()) ["hello"; "world"]
+\end{minted}
+
+\begin{verbatim}
+val accumulateR: func: ('a -> 'b) -> input: 'a list -> acc: 'b list -> 'b list
+val accumulate: func: ('a -> 'b) -> input: 'a list -> 'b list
+val test1: int list = [1; 4; 9]
+val test2: string list = ["HELLO"; "WORLD"]
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:orgcad67cb},fragile]{Space Age}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+type Planet = 
+    | Mercury
+    | Venus
+    | Earth
+    | Mars
+    | Jupiter
+    | Saturn
+    | Uranus
+    | Neptune
+let orbitalPeriodRelativeToEarthOn planet = 
+    match planet with
+    | Mercury -> 0.2408467
+    | Venus -> 0.61519726
+    | Earth -> 1.0
+    | Mars -> 1.8808158
+    | Jupiter -> 11.862615
+    | Saturn -> 29.447498
+    | Uranus -> 84.016846
+    | Neptune -> 164.79132
+\end{minted}
+\end{frame}
+
+
+\begin{frame}[label={sec:org6b66d58},fragile]{Space Age (II)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+open System
+[<Literal>]
+let SecondsInOneEarthYear = 31557600.0
+let secondsInAYearOn planet =
+    SecondsInOneEarthYear * orbitalPeriodRelativeToEarthOn planet
+let round (number : float) = Math.Round(number, 2)
+let age (planet: Planet) (seconds: int64): float =
+    float seconds / (secondsInAYearOn planet)
+    |> round
+let test1 = age Earth 1000000000L
+\end{minted}
+
+\begin{verbatim}
+[<Literal>]
+val SecondsInOneEarthYear: float = 31557600
+val secondsInAYearOn: planet: Planet -> float
+val round: number: float -> float
+val age: planet: Planet -> seconds: int64 -> float
+val test1: float = 31.69
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org486e818},fragile]{Zusammenfassung}
+ \begin{itemize}
+\item nutze \href{https://exercism.io}{exercism.io}!
+\item Vermeide \texttt{mutable}!!
+\item nur wichtiges verdient einen Namen
+\item Vertraue der \alert{Pipe} (\texttt{>{}>{}}, \texttt{|>}, \ldots{})!!
+\item If-Then-Else mit Boolean ist unnötig
+\item Parametrisiere!
+\item If-Then-Else vermeiden \ldots{} besser \texttt{match}!
+\item Be lazy! (vermeide \texttt{for}-loops)
+\item \href{https://fsharpforfunandprofit.com/troubleshooting-fsharp/}{Troubleshooting F\#}
+\item \href{https://docs.microsoft.com/de-de/dotnet/fsharp/style-guide/}{F\#-Styleguide}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orged8d30e}]{Pause}
+\begin{block}{}
+You’re bound to be unhappy if you optimize everything.
+
+\null\hfill -- Donald Knuth
+\end{block}
+\end{frame}
+
+
+\section{DDD (Domain Driven Design) }
+\label{sec:orgd76e0cd}
+\begin{frame}[label={sec:orga360aa5}]{DDD}
+\(\leadsto\) \href{./4.1 Dmmf.pdf}{Domain Driven Design}
+
+\null\hfill--Scott Wlashin: \href{https://fsharpforfunandprofit.com/series/designing-with-types/}{F\# for Fun and Profit}
+\end{frame}
+
+
+\begin{frame}[label={sec:org2c006f4}]{Prinzipien}
+\begin{itemize}
+\item Verwende die Sprache der Domäne (ubiquitous Language)
+\item Values und Entities
+\item der Code ist das Design (kein UML nötig)
+\item Design mit (algebraischen) Typen
+\begin{itemize}
+\item Option statt Null
+\item DU statt Vererbung
+\end{itemize}
+\item illegale Konstellationen sollten nicht repräsentierbar sein!
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orgb0e50eb}]{Pause}
+\begin{block}{}
+Are you quite sure that all those bells and whistles, all those wonderful facilities of your so called powerful programming languages, belong to the solution set rather than the problem set?
+
+\null\hfill -- Edsger Dijkstra
+\end{block}
+\end{frame}
+
+\begin{frame}[label={sec:org908f591}]{DDD Übung 1 (Contacts -- ex 2)}
+A Contact has
+
+\begin{itemize}
+\item a personal name
+\item an optional email address
+\item an optional postal address
+\item Rule: a contact must have an email or a postal address
+\end{itemize}
+
+A Personal Name consists of a first name, middle initial, last name
+
+\begin{itemize}
+\item Rule: the first name and last name are required
+\item Rule: the middle initial is optional
+\item Rule: the first name and last name must not be more than 50 chars
+\item Rule: the middle initial is exactly 1 char, if present
+\end{itemize}
+
+A postal address consists of a four address fields plus a country
+
+\begin{itemize}
+\item Rule: An Email Address can be verified or unverified
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org0c8e78f}]{DDD Übung 2 (Payments -- ex 3)}
+The payment taking system should accept:
+
+\begin{itemize}
+\item Cash
+\item Credit cards
+\item Cheques
+\item Paypal
+\item Bitcoin
+\end{itemize}
+
+A payment consists of a:
+
+\begin{itemize}
+\item payment
+\item non-negative amount
+\end{itemize}
+
+After designing the types, create functions that will:
+
+\begin{itemize}
+\item print a payment method
+\item print a payment, including the amount
+\item create a new payment from an amount and method
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org550de0a}]{DDD Übung 3 (Refactoring -- ex 4)}
+Much C\# code has implicit states that you can recognize by fields called "IsSomething", or nullable date.
+
+This is a sign that states transitions are present but not being modelled properly.
+\end{frame}
+
+\begin{frame}[label={sec:org1ffe9b5}]{DDD Übung 4 (Shopping Cart -- fsm ex 3)}
+Create types that model an e-commerce shopping cart.
+
+\begin{itemize}
+\item Rule: "You can't remove an item from an empty cart"!
+\item Rule: "You can't change a paid cart"!
+\item Rule: "You can't pay for a cart twice"!
+\end{itemize}
+
+States are:
+\begin{itemize}
+\item Empty
+\item ActiveCartData
+\item PaidCartData
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org02565e6}]{Pause}
+\begin{block}{}
+About the use of language: it is impossible to sharpen a pencil with a blunt axe. 
+It is equally vain to try to do it with ten blunt axes instead.
+
+\null\hfill -- Edsger Dijkstra
+\end{block}
+\end{frame}
+
+\section{Property Based Testing }
+\label{sec:orgdc574d9}
+\begin{frame}[label={sec:orgfb7c4a2},fragile]{Example Based Tests :)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+module Test1 =
+    open Implementation1
+    let tests = testList "implementation 1" [
+        test "add 1 3 = 4" {
+            let actual = add 1 3
+            let expected = 4
+            Expect.equal expected actual "" }
+        test "add 2 2 = 4" {
+            let actual = add 2 2
+            let expected = 4
+            Expect.equal expected actual "" } ];;
+runTests expectoConfig Test1.tests
+\end{minted}
+
+\begin{verbatim}
+[23:23:18 INF] EXPECTO? Running tests... <Expecto>
+[23:23:18 INF] EXPECTO! 2 tests run in 00:00:00.0117930 for implementation 1 – 2 passed, 0 ignored, 0 failed, 0 errored. Success! <Expecto>
+val it: int = 0
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org417ed81},fragile]{Evil Developer From Hell :(}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+module Implementation1 =
+    let add x y =
+        4
+\end{minted}
+
+\begin{verbatim}
+module Implementation1 =
+  val add: x: 'a -> y: 'b -> int
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:orgd769589}]{PBT}
+\(\leadsto\) \href{./4.2 An introduction to property based testing.pdf}{Property Based Testing}
+
+\null\hfill--Scott Wlashin: \href{https://fsharpforfunandprofit.com/series/property-based-testing/}{F\# for Fun and Profit}
+\end{frame}
+
+\begin{frame}[label={sec:org7e44b6f},fragile]{FsCheck}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let add1 x y = x + y
+let add2 x y = x - y
+let commutativeProperty f x y =
+   let result1 = f x y
+   let result2 = f y x
+   result1 = result2;;
+FsCheck.Check.Quick (commutativeProperty add1)
+FsCheck.Check.Quick (commutativeProperty add2)
+\end{minted}
+
+\begin{verbatim}
+FsCheck.Check.Quick (commutativeProperty add1)
+FsCheck.Check.Quick (commutativeProperty add2);;
+Ok, passed 100 tests.
+Falsifiable, after 1 test (2 shrinks) (StdGen (406853881, 297320661)):
+Original:
+1
+-1
+Shrunk:
+0
+1
+val it: unit = ()
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org7d59835},fragile]{FsCheck (Generate)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+type Temp = F of int | C of float;;
+let fGen =
+    FsCheck.Gen.choose(32,212)
+    |> FsCheck.Gen.map (fun i -> F i);;
+let cGen =
+    FsCheck.Gen.choose(0,100)
+    |> FsCheck.Gen.map (fun i -> C (float i));;
+let tempGen =
+    FsCheck.Gen.oneof [fGen; cGen]
+
+let test = tempGen |> FsCheck.Gen.sample 0 20
+test
+\end{minted}
+
+\begin{verbatim}
+let tempGen =
+    FsCheck.Gen.oneof [fGen; cGen]
+
+let test = tempGen |> FsCheck.Gen.sample 0 20
+test;;
+val tempGen: Gen<Temp> = Gen <fun:Bind@88>
+val test: Temp list =
+  [F 131; F 99; F 76; F 44; C 44.0; C 34.0; C 54.0; C 44.0; F 92; F 60; F 37;
+   F 186; F 163; C 74.0; C 83.0; C 98.0; F 194; C 59.0; C 4.0; C 32.0]
+val it: Temp list =
+  [F 131; F 99; F 76; F 44; C 44.0; C 34.0; C 54.0; C 44.0; F 92; F 60; F 37;
+   F 186; F 163; C 74.0; C 83.0; C 98.0; F 194; C 59.0; C 4.0; C 32.0]
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org669b3c0},fragile]{FsCheck (Shrink)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+open FsCheck
+let smallerThan81Property x = x < 81
+FsCheck.Check.Quick smallerThan81Property
+
+let test1 = FsCheck.Arb.shrink 100 |> Seq.toList
+let test2 = FsCheck.Arb.shrink 88 |> Seq.toList
+test2
+\end{minted}
+
+\begin{verbatim}
+Falsifiable, after 96 tests (2 shrinks) (StdGen (408706551, 297320661)):
+Original:
+94
+Shrunk:
+81
+val smallerThan81Property: x: int -> bool
+val test1: int list = [0; 50; 75; 88; 94; 97; 99]
+val test2: int list = [0; 44; 66; 77; 83; 86; 87]
+val it: int list = [0; 44; 66; 77; 83; 86; 87]
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org0695c8f}]{Auswahl der Eigenschaften}
+\begin{itemize}
+\item Unterschiedlicher Weg, gleiches Ziel (Map(f)(Option(x))=Option(f x))
+\item Hin und Her (z.B. Reverse einer Liste)
+\item Invarianten (z.B. Länge einer Liste bei Sortierung)
+\item Idempotenz (noch einmal bringt nichts mehr)
+\item Divide et Impera! (teile und herrsche)
+\item Hard to prove, easy to verify (Primzahlzerlegung)
+\item Test-Orakel (z.B. einfach aber langsam)
+\end{itemize}
+\end{frame}
+
+\section{Ende }
+\label{sec:org3fd273b}
+\begin{frame}[label={sec:orgefcd6f1}]{Zusammenfassung}
+\begin{itemize}
+\item funktionales Domain Modeling (DDD)
+\item eigenschaftsbasiertes Testen (Property Based Testing)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org2206560}]{Links}
+\begin{itemize}
+\item \href{https://fsharpforfunandprofit.com/ddd/}{Domain Driven Design}
+\item \href{https://fsharpforfunandprofit.com/books/}{Domain Modeling Made Functional}
+\item \href{https://github.com/fscheck/FsCheck}{FsCheck}
+\item \href{https://fsharpforfunandprofit.com/posts/property-based-testing/}{An introduction to property-based testing}
+\item \href{https://fsharpforfunandprofit.com/posts/property-based-testing-2/}{Choosing properties for property-based testing}
+\end{itemize}
+\end{frame}
+\end{document}
