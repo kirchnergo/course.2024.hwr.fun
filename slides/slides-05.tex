@@ -1,0 +1,460 @@
+% Created 2024-05-03 Fri 11:42
+% Intended LaTeX compiler: pdflatex
+\documentclass[t]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\mode<beamer>{\usetheme{Amsterdam}}
+\mode<beamer>{\usecolortheme{rose}}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage[babelshorthands=true]{german}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage[misc]{ifsym}
+\definecolor{darkblue}{rgb}{0,0,.5}
+\definecolor{darkgreen}{rgb}{0,.5,0}
+\definecolor{islamicgreen}{rgb}{0.0, 0.56, 0.0}
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{mintedbg}{rgb}{0.95,0.95,0.95}
+\definecolor{arsenic}{rgb}{0.23, 0.27, 0.29}
+\definecolor{prussianblue}{rgb}{0.0, 0.19, 0.33}
+\definecolor{coolblack}{rgb}{0.0, 0.18, 0.39}
+\hypersetup{colorlinks=true, breaklinks=true, anchorcolor=blue,linkcolor=white, citecolor=islamicgreen, filecolor=darkred,  urlcolor=darkblue}
+\usepackage{booktabs}
+\usepackage{pgf}
+\usepackage{minted}
+\RequirePackage{fancyvrb}
+\DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+\usetheme{default}
+\author{Göran Kirchner\thanks{e\_kirchnerg@doz.hwr-berlin.de}}
+\date{2024-05-03}
+\title{Funktionale Programmierung in F\# (5)}
+\subtitle{Parser Combinators}
+\hypersetup{
+ pdfauthor={Göran Kirchner},
+ pdftitle={Funktionale Programmierung in F\# (5)},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 29.1 (Org mode 9.6.6)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+
+\section{Ziel }
+\label{sec:orgbbdf8c2}
+\begin{frame}[label={sec:org7e7496f}]{Programm}
+\begin{itemize}
+\item Programmieraufgabe
+\item Test
+\item Parser (Kombinatoren)
+\end{itemize}
+\end{frame}
+
+\section{Programmieraufgabe }
+\label{sec:org9a68bc1}
+\begin{frame}[label={sec:orgb982682},fragile]{Poker}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+type Rank =
+     | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten 
+     | Jack | Queen | King | Ace
+type HandCategory =
+     | HighCard of Rank * Rank * Rank * Rank * Rank
+     | OnePair of Rank * Rank * Rank * Rank
+     | TwoPair of Rank * Rank * Rank
+     | ThreeKind of Rank * Rank
+     | Straight of Rank
+     | Flush of Rank
+     | FullHouse of Rank * Rank
+     | FourKind of Rank * Rank
+     | StraightFlush of Rank
+     | RoyalFlush
+\end{minted}
+\end{frame}
+
+\begin{frame}[label={sec:org9273532},fragile]{Zusammenfassung}
+ \begin{itemize}
+\item nutze \href{https://exercism.io}{exercism.io}!
+\item Vermeide \texttt{mutable}!!
+\item nur wichtiges verdient einen Namen
+\item Vertraue der \alert{Pipe} (\texttt{>{}>{}}, \texttt{|>}, \ldots{})!!
+\item If-Then-Else mit Boolean ist unnötig
+\item Parametrisiere!
+\item If-Then-Else vermeiden \ldots{} besser \texttt{match}!
+\item Be lazy! (vermeide \texttt{for}-loops)
+\item \href{https://fsharpforfunandprofit.com/troubleshooting-fsharp/}{Troubleshooting F\#}
+\item \href{https://docs.microsoft.com/de-de/dotnet/fsharp/style-guide/}{F\#-Styleguide}
+\end{itemize}
+\end{frame}
+
+\section{Test }
+\label{sec:orgc3075cb}
+\begin{frame}[label={sec:org1a1c00b}]{Test}
+\begin{itemize}
+\item 60 Minuten
+\end{itemize}
+
+\(\leadsto\) \href{../src/test/test.md}{Test}
+\end{frame}
+
+\section{Parser }
+\label{sec:org5594484}
+\begin{frame}[label={sec:org750c248},fragile]{Parser 1 (hard-coded character)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+open System
+let A_Parser str =
+    if String.IsNullOrEmpty(str) then
+        (false,"")
+    else if str.[0] = 'A' then
+        let remaining = str.[1..]
+        (true,remaining)
+    else
+        (false,str)
+let inputABC = "ABCD"
+let inputZBC = "ZBCD"
+let test11 = A_Parser inputABC
+let test12 = A_Parser inputZBC
+\end{minted}
+
+\begin{verbatim}
+val A_Parser: str: string -> bool * string
+val inputABC: string = "ABCD"
+val inputZBC: string = "ZBCD"
+val test11: bool * string = (true, "BCD")
+val test12: bool * string = (false, "ZBCD")
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:orgbe2c99f},fragile]{Parser 2 (match a specified character)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let pchar (charToMatch,str) =
+    if String.IsNullOrEmpty(str) then
+        let msg = "No more input"
+        (msg,"")
+    else 
+        let first = str.[0] 
+        if first = charToMatch then
+            let remaining = str.[1..]
+            let msg = sprintf "Found %c" charToMatch
+            (msg,remaining)
+        else
+            let msg = sprintf "Expecting '%c'. Got '%c'" charToMatch first
+            (msg,str)
+\end{minted}
+
+\begin{verbatim}
+val pchar: charToMatch: char * str: string -> string * string
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org360c6cc},fragile]{Parser 2 (2)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let inputABC = "ABCD"
+let inputZBC = "ZBCD"
+let test21 = pchar('A',inputABC) 
+let test22 = pchar('A',inputZBC)
+\end{minted}
+
+\begin{verbatim}
+val inputABC: string = "ABCD"
+val inputZBC: string = "ZBCD"
+val test21: string * string = ("Found A", "BCD")
+val test22: string * string = ("Expecting 'A'. Got 'Z'", "ZBCD")
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org7cb0886},fragile]{Parser 3 (return a Result)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let pchar (charToMatch, s) =
+    if String.IsNullOrEmpty(s) then
+        Error "No more input"
+    else
+        let first = s.[0]
+        if first = charToMatch then
+            let remaining = s.[1..]
+            Ok (charToMatch, remaining)
+        else
+            let msg = sprintf "Expecting '%c'. Got '%c'" charToMatch first
+            Error msg
+\end{minted}
+
+\begin{verbatim}
+val pchar: charToMatch: char * s: string -> Result<(char * string),string>
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:orgeacafaf},fragile]{Parser 3 (2)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let test31 = pchar('A',inputABC) 
+let test32 = pchar('A',inputZBC) 
+let test33 = pchar('Z',inputZBC)
+\end{minted}
+
+\begin{verbatim}
+val test31: Result<(char * string),string> = Ok ('A', "BCD")
+val test32: Result<(char * string),string> = Error "Expecting 'A'. Got 'Z'"
+val test33: Result<(char * string),string> = Ok ('Z', "BCD")
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org7b98d91},fragile]{Parser 4 (use currying)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let pchar charToMatch str = 
+    if String.IsNullOrEmpty(str) then
+        Error "No more input"
+    else
+        let first = str.[0] 
+        if first = charToMatch then
+            let remaining = str.[1..]
+            Ok (charToMatch,remaining)
+        else
+            let msg = sprintf "Expecting '%c'. Got '%c'" charToMatch first
+            Error msg
+\end{minted}
+
+\begin{verbatim}
+val pchar: charToMatch: char -> str: string -> Result<(char * string),string>
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org7f066a4},fragile]{Parser 4 (2)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let parseA = pchar 'A'
+let inputABC = "ABC"
+let inputZBC = "ZBC"
+let test41 = parseA inputABC
+let test42 = parseA inputZBC
+let parseZ = pchar 'Z' 
+let test43 = parseZ inputZBC
+\end{minted}
+
+\begin{verbatim}
+val parseA: (string -> Result<(char * string),string>)
+val inputABC: string = "ABC"
+val inputZBC: string = "ZBC"
+val test41: Result<(char * string),string> = Ok ('A', "BC")
+val test42: Result<(char * string),string> = Error "Expecting 'A'. Got 'Z'"
+val parseZ: (string -> Result<(char * string),string>)
+val test43: Result<(char * string),string> = Ok ('Z', "BC")
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org5b296fc},fragile]{Parser 5 (type to wrap the parser function)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+type Parser<'T> =
+    | Parser of (string -> Result<'T , string>)
+let pchar charToMatch = 
+    let innerFn str =
+        if String.IsNullOrEmpty(str) then
+            Error "No more input"
+        else
+            let first = str.[0] 
+            if first = charToMatch then
+                let remaining = str.[1..]
+                Ok (charToMatch, remaining)
+            else
+                let msg = sprintf "Expecting '%c'. Got '%c'" charToMatch first
+                Error msg
+    Parser innerFn
+\end{minted}
+
+\begin{verbatim}
+type Parser<'T> = | Parser of (string -> Result<'T,string>)
+val pchar: charToMatch: char -> Parser<char * string>
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:orgea80157},fragile]{Parser 5 (2)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let parseA = pchar 'A'
+let inputABC = "ABC"
+parseA inputABC
+\end{minted}
+
+\begin{verbatim}
+
+  parseA inputABC;;
+  ^^^^^^
+
+error FS0003: This value is not a function and cannot be applied.
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org499de12},fragile]{Parser 5 (3)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let run parser input = 
+    let (Parser innerFn) = parser 
+    innerFn input
+let parseA = pchar 'A' 
+let inputABC = "ABC"
+let test1 = run parseA inputABC
+let inputZBC = "ZBC"
+let test2 = run parseA inputZBC
+\end{minted}
+
+\begin{verbatim}
+val run: parser: Parser<'a> -> input: string -> Result<'a,string>
+val parseA: Parser<char * string> = Parser <fun:pchar@238-14>
+val inputABC: string = "ABC"
+val test1: Result<(char * string),string> = Ok ('A', "BC")
+val inputZBC: string = "ZBC"
+val test2: Result<(char * string),string> = Error "Expecting 'A'. Got 'Z'"
+\end{verbatim}
+\end{frame}
+
+\section{Parser Kombinatoren }
+\label{sec:orgcd35902}
+\begin{frame}[label={sec:orgb49b178}]{Understanding Parser Combinators}
+\(\leadsto\) \href{./5 Understanding parser combinators.pdf}{Understanding parser combinators} (Scott Wlashin)
+
+\null\hfill--Scott Wlashin: \href{https://fsharpforfunandprofit.com/parser}{F\# for Fun and Profit}
+\end{frame}
+
+\begin{frame}[label={sec:org7a79f22}]{FParsec Tutorial}
+\begin{itemize}
+\item \href{http://www.quanttec.com/fparsec/tutorial.html\#}{FParsec Tutorial}
+\item \href{http://www.quanttec.com/fparsec/users-guide/}{User’s Guide}
+\item \href{http://www.quanttec.com/fparsec/about/fparsec-vs-alternatives.html}{FParsec vs alternatives}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org9c3497d},fragile]{Using FParsec (1)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+#r "../src/5/02-fparsec/lib/FParsecCS.dll";; 
+#r "../src/5/02-fparsec/lib/FParsec.dll";;
+open FParsec
+let test p str =
+    match run p str with
+    | Success(result, _, _)   -> printfn "Success: %A" result
+    | Failure(errorMsg, _, _) -> printfn "Failure: %s" errorMsg;;
+test pfloat "1.25"
+test pfloat "1.25E 2"
+\end{minted}
+
+\begin{verbatim}
+test pfloat "1.25"
+test pfloat "1.25E 2";;
+Success: 1.25                           
+Failure: Error in Ln: 1 Col: 6
+1.25E 2
+     ^
+Expecting: decimal digit
+
+val it: unit = ()
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:orgfce0df4},fragile]{Using FParsec (2)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let str s = pstring s
+let floatBetweenBrackets:Parser<float, unit>  = str "[" >>. pfloat .>> str "]";;
+
+test floatBetweenBrackets "[1.0]"
+test floatBetweenBrackets "[]"
+test floatBetweenBrackets "[1.0]"
+\end{minted}
+
+\begin{verbatim}
+test floatBetweenBrackets "[1.0]"
+test floatBetweenBrackets "[]"
+test floatBetweenBrackets "[1.0]";;
+Success: 1.0                            
+Failure: Error in Ln: 1 Col: 2
+[]
+ ^
+Expecting: floating-point number
+
+Success: 1.0                            
+val it: unit = ()
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label={sec:org8356b84},fragile]{Using FParsec (3)}
+ \begin{minted}[bgcolor=mintedbg,frame=none,framesep=0pt,mathescape=true,fontsize=\scriptsize,breaklines=true,linenos=false,numbersep=5pt,gobble=0]{fsharp}
+let betweenStrings s1 s2 p = str s1 >>. p .>> str s2;;
+let floatBetweenBrackets_:Parser<float, unit> = pfloat |> betweenStrings "[" "]";;
+let floatBetweenDoubleBrackets_:Parser<float, unit> = pfloat |> betweenStrings "[[" "]]";;
+test floatBetweenBrackets_ "[1.0]"
+test floatBetweenDoubleBrackets_ "[[1.0]]"
+let between_ pBegin pEnd p  = pBegin >>. p .>> pEnd;;
+let betweenStrings_ s1 s2 p = p |> between_ (str s1) (str s2);;
+test (many floatBetweenBrackets) ""
+test (many floatBetweenBrackets) "[1.0]"
+test (many floatBetweenBrackets) "[2][3][4]"
+test (many floatBetweenBrackets) "[1][2.0E]"
+\end{minted}
+
+\begin{verbatim}
+Success: []
+Success: [1.0]
+Success: [2.0; 3.0; 4.0]
+Failure: Error in Ln: 1 Col: 9
+[1][2.0E]
+        ^
+Expecting: decimal digit
+
+val it: unit = ()
+\end{verbatim}
+\end{frame}
+
+\section{Ende }
+\label{sec:org1f0db14}
+\begin{frame}[label={sec:org8b71561}]{Zusammenfassung (Kurs)}
+\begin{itemize}
+\item Wichtige Werkzeuge (git, dotnet, code)
+\item Elementare Syntax
+\item Funktionen, Pattern Matching, Discriminated Unions (DU)
+\item Tuple, Record, List, Array, Seq
+\item funktionale Operationen auf Listen (Tail-Rekursion)
+\item funktionaler Umgang mit fehlenden Daten (Option)
+\item funktionaler Umgang mit Fehlern (Result)
+\item funktionales Design (statt Patterns: Funktionen \& Verkettung)
+\item funktionales Refactoring
+\item funktionales Domain Modeling (DDD)
+\item eigenschaftsbasiertes Testen (Property Based Testing) (cool!!)
+\item funktionale Parser (Kombinatoren) (noch cooler!!)
+\end{itemize}
+\(\leadsto\) \alert{\alert{Was ist Funktionale Programmierung?}}
+\end{frame}
+
+\begin{frame}[label={sec:orgb0480b3}]{Links}
+\begin{itemize}
+\item \href{https://fsharp.org/}{fsharp.org}
+\item \href{https://docs.microsoft.com/de-de/dotnet/fsharp/}{docs.microsoft.com/../dotnet/fsharp}
+\item \href{https://sergeytihon.com/}{F\# weekly}
+\item \href{https://fsharpforfunandprofit.com/}{fsharpforfunandprofit.com}
+\item \href{https://github.com/fsprojects/awesome-fsharp}{github.com/../awesome-fsharp}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orgfaba227}]{Ende}
+\begin{itemize}
+\item Wie geht es weiter?
+\item \href{https://exercism.io}{Exercism!}
+\item Buchtipps
+\begin{itemize}
+\item \href{https://pragprog.com/book/swdddf/domain-modeling-made-functional}{Domain Modeling Made Functional} (F\#)
+\item \href{https://www.apress.com/gp/book/9781484239995}{Stylish F\#} (F\#)
+\item \href{https://www.cambridge.org/core/books/pearls-of-functional-algorithm-design/B0CF0AC5A205AF9491298684113B088F\#}{Perls of Functional Algorithm Design} (Haskell)
+\item \href{https://www.cs.ox.ac.uk/publications/books/functional/}{Thinking Functional with Haskell} (Haskell)
+\item \href{http://www.paulgraham.com/onlisp.html}{On Lisp} (LISP)
+\item \href{http://www.iqool.de/FPMP.html}{Funktionale Programmierung und Metaprogrammierung} (LISP)
+\item \href{https://github.com/norvig/paip-lisp}{Paradigms of Artificial Intelligence Programming} (LISP)
+\item \href{https://adv-r.hadley.nz/}{Advanced R} (R)
+\end{itemize}
+\item Sprachen: \href{https://www.r-project.org/}{R}, \href{https://www.haskell.org/}{Haskell}, \href{https://clojure.org/}{Clojure}, \href{https://lisp-lang.org/}{Common Lisp}, \href{https://elixir-lang.org/}{Elixir}, \href{https://code.kx.com/q/}{q}
+
+\item \alert{\alert{Have FUN!}}
+\end{itemize}
+\end{frame}
+\end{document}
