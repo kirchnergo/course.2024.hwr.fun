@@ -432,7 +432,7 @@ CLOSED: [2024-04-05 Fri 08:31]
   - [ ] Bank Account
   - [ ] Accumulate
   - [ ] Space Age
-- exercism.io (E-Mail bis 24.04)
+- exercism.io (E-Mail bis 29.04)
   - [ ] Poker (Programmieraufgabe)
 
 * Sample                                                           :noexport:
